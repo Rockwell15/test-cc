@@ -135,7 +135,14 @@ button:active {
     touch-action: none;
 }
 
-#startBtn {
+.game-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+#startBtn, #fullscreenBtn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -144,16 +151,23 @@ button:active {
     border-radius: 30px;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-top: 0.5rem;
 }
 
-#startBtn:hover {
+#startBtn:hover, #fullscreenBtn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
 }
 
-#startBtn:active {
+#startBtn:active, #fullscreenBtn:active {
     transform: translateY(0);
+}
+
+#fullscreenBtn {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+#fullscreenBtn:hover {
+    box-shadow: 0 10px 20px rgba(72, 187, 120, 0.4);
 }
 
 .controls-info {
@@ -172,4 +186,53 @@ button:active {
     font-size: 0.85rem;
     color: #666;
     margin: 0.25rem 0;
+}
+
+/* Fullscreen mode styles */
+.fullscreen-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.fullscreen-wrapper .game-info {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(245, 245, 245, 0.9);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+.fullscreen-wrapper #tetrisCanvas {
+    max-width: 90vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+}
+
+.fullscreen-wrapper .fullscreen-controls {
+    position: absolute;
+    bottom: 20px;
+    display: flex;
+    gap: 1rem;
+}
+
+.fullscreen-wrapper button {
+    padding: 15px 35px;
+    font-size: 1.1rem;
+}
+
+.fullscreen-wrapper .controls-info {
+    display: none;
 }
