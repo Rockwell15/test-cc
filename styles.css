@@ -9,8 +9,10 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 2rem 0;
 }
 
 .container {
@@ -76,4 +78,98 @@ button:active {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.tetris-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    margin-top: 2rem;
+}
+
+.tetris-container h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.score-board {
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.score-board div {
+    margin: 0.25rem 0;
+    color: #555;
+}
+
+#score, #highScore {
+    font-weight: bold;
+    color: #764ba2;
+}
+
+#gameStatus {
+    font-weight: bold;
+    color: #667eea;
+}
+
+#tetrisCanvas {
+    border: 2px solid #333;
+    border-radius: 5px;
+    margin: 1rem 0;
+    cursor: pointer;
+    touch-action: none;
+}
+
+#startBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+#startBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+#startBtn:active {
+    transform: translateY(0);
+}
+
+.controls-info {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.controls-info h3 {
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.controls-info p {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0.25rem 0;
 }
