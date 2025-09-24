@@ -8,6 +8,11 @@ class TetrisGame {
         this.canvas.width = this.blockSize * this.cols;
         this.canvas.height = this.blockSize * this.rows;
 
+        this.originalWidth = this.canvas.width;
+        this.originalHeight = this.canvas.height;
+        this.isFullscreen = false;
+        this.fullscreenWrapper = null;
+
         this.board = [];
         this.currentPiece = null;
         this.gameOver = false;
@@ -127,6 +132,22 @@ class TetrisGame {
                 this.start();
             } else if (this.gameOver) {
                 this.restart();
+            }
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            this.toggleFullscreen();
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                this.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isFullscreen) {
+                this.exitFullscreen();
             }
         });
     }
@@ -376,6 +397,128 @@ class TetrisGame {
             this.ctx.fillStyle = '#FFD700';
             this.ctx.fillText('NEW HIGH SCORE!', this.canvas.width / 2, this.canvas.height / 2 + 50);
         }
+    }
+
+    toggleFullscreen() {
+        if (!this.isFullscreen) {
+            this.enterFullscreen();
+        } else {
+            this.exitFullscreen();
+        }
+    }
+
+    enterFullscreen() {
+        this.isFullscreen = true;
+
+        // Create fullscreen wrapper
+        this.fullscreenWrapper = document.createElement('div');
+        this.fullscreenWrapper.className = 'fullscreen-wrapper';
+
+        // Clone and move game info
+        const gameInfo = document.querySelector('.game-info').cloneNode(true);
+        this.fullscreenWrapper.appendChild(gameInfo);
+
+        // Move canvas to fullscreen wrapper
+        const originalParent = this.canvas.parentElement;
+        this.canvas.setAttribute('data-original-parent', '');
+        this.fullscreenWrapper.appendChild(this.canvas);
+
+        // Create fullscreen controls
+        const controls = document.createElement('div');
+        controls.className = 'fullscreen-controls';
+
+        const startBtn = document.getElementById('startBtn').cloneNode(true);
+        startBtn.id = 'startBtnFullscreen';
+        startBtn.addEventListener('click', () => {
+            if (this.isPaused && !this.gameOver) {
+                this.start();
+            } else if (this.gameOver) {
+                this.restart();
+            }
+        });
+
+        const exitBtn = document.createElement('button');
+        exitBtn.textContent = '✕ Exit Fullscreen';
+        exitBtn.addEventListener('click', () => this.exitFullscreen());
+
+        controls.appendChild(startBtn);
+        controls.appendChild(exitBtn);
+        this.fullscreenWrapper.appendChild(controls);
+
+        // Add wrapper to body
+        document.body.appendChild(this.fullscreenWrapper);
+
+        // Request fullscreen
+        if (this.fullscreenWrapper.requestFullscreen) {
+            this.fullscreenWrapper.requestFullscreen();
+        } else if (this.fullscreenWrapper.webkitRequestFullscreen) {
+            this.fullscreenWrapper.webkitRequestFullscreen();
+        } else if (this.fullscreenWrapper.msRequestFullscreen) {
+            this.fullscreenWrapper.msRequestFullscreen();
+        }
+
+        // Scale canvas for fullscreen
+        this.resizeCanvasForFullscreen();
+
+        // Update button text
+        document.getElementById('fullscreenBtn').textContent = '✕ Exit Fullscreen';
+    }
+
+    exitFullscreen() {
+        if (!this.isFullscreen) return;
+
+        this.isFullscreen = false;
+
+        // Exit fullscreen mode
+        if (document.fullscreenElement) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Move canvas back to original position
+        if (this.fullscreenWrapper) {
+            const tetrisContainer = document.querySelector('.tetris-container');
+            const gameButtons = tetrisContainer.querySelector('.game-buttons');
+            tetrisContainer.insertBefore(this.canvas, gameButtons);
+
+            // Remove fullscreen wrapper
+            this.fullscreenWrapper.remove();
+            this.fullscreenWrapper = null;
+        }
+
+        // Reset canvas size
+        this.canvas.width = this.originalWidth;
+        this.canvas.height = this.originalHeight;
+        this.blockSize = 30;
+
+        // Update button text
+        document.getElementById('fullscreenBtn').textContent = '⛶ Fullscreen';
+
+        // Redraw the game
+        this.draw();
+    }
+
+    resizeCanvasForFullscreen() {
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.8;
+
+        // Calculate scale to fit screen
+        const scaleX = maxWidth / this.originalWidth;
+        const scaleY = maxHeight / this.originalHeight;
+        const scale = Math.min(scaleX, scaleY, 3); // Max 3x scaling
+
+        // Update canvas size
+        this.canvas.width = this.originalWidth * scale;
+        this.canvas.height = this.originalHeight * scale;
+        this.blockSize = 30 * scale;
+
+        // Redraw the game
+        this.draw();
     }
 }
 
