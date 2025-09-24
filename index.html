@@ -13,6 +13,26 @@
         <button id="changeGreeting">Click me!</button>
         <div id="counter">Button clicked: <span id="count">0</span> times</div>
     </div>
+
+    <div class="tetris-container">
+        <h2>Tetris Game</h2>
+        <div class="game-info">
+            <div class="score-board">
+                <div>Score: <span id="score">0</span></div>
+                <div>High Score: <span id="highScore">0</span></div>
+            </div>
+            <div id="gameStatus">Click to Start</div>
+        </div>
+        <canvas id="tetrisCanvas"></canvas>
+        <button id="startBtn">Start</button>
+        <div class="controls-info">
+            <h3>Controls:</h3>
+            <p><strong>Desktop:</strong> Arrow keys to move, Up/Space to rotate</p>
+            <p><strong>Mobile:</strong> Swipe to move, tap to rotate, swipe down to speed up</p>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="tetris.js"></script>
 </body>
 </html>
