@@ -5,15 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const greetings = [
         'Hello World!',
-        'Bonjour le monde!',
-        'Hola Mundo!',
-        'Ciao mondo!',
-        'Hallo Welt!',
-        'Olá Mundo!',
-        'Привет мир!',
-        'こんにちは世界!',
-        '你好世界!',
-        'مرحبا بالعالم!'
+        'こんにちは世界!'
     ];
 
     let currentIndex = 0;
