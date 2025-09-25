@@ -170,7 +170,7 @@ class TetrisGame {
         this.updateUI();
         this.draw();
         document.getElementById('startBtn').textContent = 'Start';
-        document.getElementById('gameStatus').textContent = 'Click to Start';
+        document.getElementById('gameStatus').textContent = 'start';
     }
 
     spawnPiece() {
