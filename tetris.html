@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navigation">
+        <a href="index.html">← Back to Home</a>
+    </nav>
+
+    <div class="tetris-container">
+        <h2>Tetris Game</h2>
+        <div class="game-info">
+            <div class="score-board">
+                <div>Score: <span id="score">0</span></div>
+                <div>High Score: <span id="highScore">0</span></div>
+            </div>
+            <div id="gameStatus">start</div>
+        </div>
+        <canvas id="tetrisCanvas"></canvas>
+        <div class="game-buttons">
+            <button id="startBtn">Start</button>
+            <button id="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+        </div>
+        <div class="controls-info">
+            <h3>Controls:</h3>
+            <p><strong>Desktop:</strong> Arrow keys to move, Up/Space to rotate</p>
+            <p><strong>Mobile:</strong> Swipe to move, tap to rotate, swipe down to speed up</p>
+        </div>
+    </div>
+
+    <script src="tetris.js"></script>
+</body>
+</html>

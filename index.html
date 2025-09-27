@@ -3,39 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World App</title>
+    <title>Game Hub</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1 id="greeting">Hello World!</h1>
-        <p>Welcome to our simple web application</p>
-        <button id="changeGreeting">Click me!</button>
-        <div id="counter">Button clicked: <span id="count">0</span> times</div>
-    </div>
+        <h1>Welcome to Game Hub</h1>
+        <p>Choose an activity to get started:</p>
 
-    <div class="tetris-container">
-        <h2>Tetris Game</h2>
-        <div class="game-info">
-            <div class="score-board">
-                <div>Score: <span id="score">0</span></div>
-                <div>High Score: <span id="highScore">0</span></div>
+        <div class="navigation-cards">
+            <div class="nav-card">
+                <h2>🌍 Hello World Clicks</h2>
+                <p>A simple interactive greeting application with click counter</p>
+                <a href="hello-world.html" class="nav-link">Play Now</a>
             </div>
-            <div id="gameStatus">start</div>
-        </div>
-        <canvas id="tetrisCanvas"></canvas>
-        <div class="game-buttons">
-            <button id="startBtn">Start</button>
-            <button id="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
-        </div>
-        <div class="controls-info">
-            <h3>Controls:</h3>
-            <p><strong>Desktop:</strong> Arrow keys to move, Up/Space to rotate</p>
-            <p><strong>Mobile:</strong> Swipe to move, tap to rotate, swipe down to speed up</p>
+
+            <div class="nav-card">
+                <h2>🎮 Tetris</h2>
+                <p>Classic block-stacking puzzle game</p>
+                <a href="tetris.html" class="nav-link">Play Now</a>
+            </div>
+
+            <div class="nav-card">
+                <h2>🐍 Snake Game</h2>
+                <p>Classic snake game - Coming Soon!</p>
+                <a href="snake.html" class="nav-link">View More</a>
+            </div>
         </div>
     </div>
-
-    <script src="script.js"></script>
-    <script src="tetris.js"></script>
 </body>
 </html>
