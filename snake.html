@@ -11,10 +11,27 @@
         <a href="index.html">← Back to Home</a>
     </nav>
 
-    <div class="container">
-        <h1>Snake Game</h1>
-        <p>🐍 Coming Soon!</p>
-        <p>This classic snake game is currently under development.</p>
+    <div class="snake-container">
+        <h2>Snake Game</h2>
+        <div class="game-info">
+            <div class="score-board">
+                <div>Score: <span id="snakeScore">0</span></div>
+                <div>High Score: <span id="snakeHighScore">0</span></div>
+            </div>
+            <div id="snakeGameStatus">Press Start</div>
+        </div>
+        <canvas id="snakeCanvas"></canvas>
+        <div class="game-buttons">
+            <button id="snakeStartBtn">Start</button>
+            <button id="snakeFullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+        </div>
+        <div class="controls-info">
+            <h3>Controls:</h3>
+            <p><strong>Desktop:</strong> Arrow keys or WASD to move</p>
+            <p><strong>Mobile:</strong> Swipe to change direction</p>
+        </div>
     </div>
+
+    <script src="snake.js"></script>
 </body>
 </html>
