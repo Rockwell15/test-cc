@@ -98,7 +98,12 @@ class TetrisGame {
             const dy = touchEndY - this.touchStartY;
 
             if (touchDuration < 200 && Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-                this.rotatePiece();
+                // Tap detected - rotate based on screen side
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const tapX = touchEndX - canvasRect.left;
+                const canvasCenter = canvasRect.width / 2;
+                const clockwise = tapX > canvasCenter;
+                this.rotatePiece(clockwise);
             } else if (Math.abs(dx) > Math.abs(dy)) {
                 if (dx > 30) {
                     this.movePiece(1, 0);
@@ -207,12 +212,21 @@ class TetrisGame {
         }
     }
 
-    rotatePiece() {
+    rotatePiece(clockwise = true) {
         if (!this.currentPiece) return;
 
-        const rotated = this.currentPiece.shape[0].map((_, i) =>
-            this.currentPiece.shape.map(row => row[i]).reverse()
-        );
+        let rotated;
+        if (clockwise) {
+            // Rotate clockwise: transpose then reverse each row
+            rotated = this.currentPiece.shape[0].map((_, i) =>
+                this.currentPiece.shape.map(row => row[i]).reverse()
+            );
+        } else {
+            // Rotate counter-clockwise: reverse each row then transpose
+            rotated = this.currentPiece.shape[0].map((_, i) =>
+                this.currentPiece.shape.map(row => row[row.length - 1 - i])
+            );
+        }
 
         const prevShape = this.currentPiece.shape;
         this.currentPiece.shape = rotated;
