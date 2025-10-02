@@ -8,16 +8,30 @@ document.addEventListener('DOMContentLoaded', function() {
         'こんにちは世界!'
     ];
 
+    const colors = [
+        '#667eea',
+        '#764ba2',
+        '#f093fb',
+        '#4facfe',
+        '#43e97b',
+        '#fa709a',
+        '#fee140',
+        '#30cfd0'
+    ];
+
     let currentIndex = 0;
     let clickCount = 0;
+    let colorIndex = 0;
 
     buttonElement.addEventListener('click', function() {
         clickCount++;
         currentIndex = (currentIndex + 1) % greetings.length;
+        colorIndex = (colorIndex + 1) % colors.length;
 
         greetingElement.style.animation = 'none';
         setTimeout(() => {
             greetingElement.textContent = greetings[currentIndex];
+            greetingElement.style.color = colors[colorIndex];
             greetingElement.style.animation = 'fadeIn 0.5s ease-in';
         }, 10);
 
