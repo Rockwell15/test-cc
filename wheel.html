@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Wheel Spinner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navigation">
+        <a href="index.html">← Back to Home</a>
+    </nav>
+
+    <div class="wheel-container">
+        <h2>🎡 Random Wheel Spinner</h2>
+
+        <div class="wheel-input-section">
+            <div class="input-group">
+                <input type="text" id="choiceInput" placeholder="Enter a choice..." />
+                <button id="addChoiceBtn">Add Choice</button>
+            </div>
+            <div id="choicesList"></div>
+        </div>
+
+        <div class="wheel-display">
+            <canvas id="wheelCanvas"></canvas>
+            <div id="wheelPointer">▼</div>
+        </div>
+
+        <div class="wheel-controls">
+            <button id="spinBtn" disabled>Spin the Wheel!</button>
+            <button id="clearBtn">Clear All</button>
+        </div>
+
+        <div id="resultDisplay"></div>
+    </div>
+
+    <script src="wheel.js"></script>
+</body>
+</html>
