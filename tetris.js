@@ -48,6 +48,8 @@ class TetrisGame {
         this.touchStartTime = null;
         this.lastTapTime = 0;
         this.pieceCount = 0; // Track number of pieces spawned
+        this.lastTouchX = null; // Track last touch position for continuous movement
+        this.lastTouchY = null;
 
         this.init();
     }
@@ -92,6 +94,8 @@ class TetrisGame {
             const touch = e.touches[0];
             this.touchStartX = touch.clientX;
             this.touchStartY = touch.clientY;
+            this.lastTouchX = touch.clientX;
+            this.lastTouchY = touch.clientY;
             this.touchStartTime = Date.now();
         });
 
@@ -151,10 +155,46 @@ class TetrisGame {
 
             this.touchStartX = null;
             this.touchStartY = null;
+            this.lastTouchX = null;
+            this.lastTouchY = null;
         });
 
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
+            if (!this.touchStartX || !this.touchStartY || this.gameOver || this.isPaused) return;
+            if (!this.currentPiece) return;
+
+            const touch = e.touches[0];
+            const currentX = touch.clientX;
+            const currentY = touch.clientY;
+
+            // Calculate movement since last touch position
+            const dx = currentX - this.lastTouchX;
+            const dy = currentY - this.lastTouchY;
+
+            // Horizontal movement
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
+                // Calculate columns to move based on accumulated movement
+                const columns = Math.round(dx / this.blockSize);
+
+                if (columns !== 0) {
+                    const direction = columns > 0 ? 1 : -1;
+                    const moves = Math.abs(columns);
+                    for (let i = 0; i < moves; i++) {
+                        if (!this.collision(direction, 0)) {
+                            this.currentPiece.x += direction;
+                            this.lastTouchX += direction * this.blockSize;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+            // Vertical (down) movement - speed up
+            else if (dy > 5 && Math.abs(dy) > Math.abs(dx)) {
+                this.dropInterval = 50;
+                this.lastTouchY = currentY; // Update to prevent repeated triggers
+            }
         });
 
         this.canvas.addEventListener('click', () => {
@@ -241,16 +281,6 @@ class TetrisGame {
             isBroken: false
         };
 
-        // Auto-break special pieces immediately after spawn
-        if (isBreakable) {
-            // Small delay to ensure piece is visible before breaking
-            setTimeout(() => {
-                if (this.currentPiece && this.currentPiece.isBreakable) {
-                    this.breakPiece();
-                }
-            }, 100);
-        }
-
         if (this.collision(0, 0)) {
             this.gameOver = true;
             this.onGameOver();
@@ -318,6 +348,9 @@ class TetrisGame {
                 }
             }
         }
+
+        // Reset drop interval to normal speed
+        this.dropInterval = 1000;
 
         // Clear the current piece
         this.currentPiece = null;
