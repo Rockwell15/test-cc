@@ -550,36 +550,26 @@ class TetrisGame {
     }
 
     updateFallingBlocks() {
-        let allSettled = true;
-
-        // Move each block down if possible
-        for (let i = 0; i < this.fallingBlocks.length; i++) {
+        // Process blocks in reverse order to handle removal safely
+        for (let i = this.fallingBlocks.length - 1; i >= 0; i--) {
             const block = this.fallingBlocks[i];
 
             // Check if block can move down
             if (block.y + 1 >= this.rows || this.board[block.y + 1][block.x]) {
-                // Block has settled - add to board
+                // Block has settled - lock it to the board
                 if (block.y >= 0) {
                     this.board[block.y][block.x] = block.color;
                 }
+                // Remove this block from the falling array
+                this.fallingBlocks.splice(i, 1);
             } else {
                 // Block can still fall
                 block.y++;
-                allSettled = false;
             }
         }
 
-        // If all blocks have settled, clear them and spawn new piece
-        if (allSettled) {
-            // Lock all blocks
-            for (let i = 0; i < this.fallingBlocks.length; i++) {
-                const block = this.fallingBlocks[i];
-                if (block.y >= 0) {
-                    this.board[block.y][block.x] = block.color;
-                }
-            }
-
-            this.fallingBlocks = [];
+        // If all blocks have settled (array is empty), spawn new piece
+        if (this.fallingBlocks.length === 0) {
             this.score += 10;
             this.clearLines();
             this.spawnPiece();
