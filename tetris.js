@@ -47,6 +47,7 @@ class TetrisGame {
         this.touchStartY = null;
         this.touchStartTime = null;
         this.lastTapTime = 0;
+        this.pieceCount = 0; // Track number of pieces spawned
 
         this.init();
     }
@@ -125,10 +126,22 @@ class TetrisGame {
                     this.lastTapTime = currentTime;
                 }
             } else if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 30) {
-                    this.movePiece(1, 0);
-                } else if (dx < -30) {
-                    this.movePiece(-1, 0);
+                // Calculate number of columns to move based on swipe distance
+                // Using blockSize as reference - each blockSize pixels of swipe = 1 column
+                const columns = Math.round(dx / this.blockSize);
+
+                // Move the piece by the calculated number of columns
+                if (columns !== 0) {
+                    // Move one column at a time to respect collisions
+                    const direction = columns > 0 ? 1 : -1;
+                    const moves = Math.abs(columns);
+                    for (let i = 0; i < moves; i++) {
+                        if (!this.collision(direction, 0)) {
+                            this.currentPiece.x += direction;
+                        } else {
+                            break; // Stop if we hit something
+                        }
+                    }
                 }
             } else {
                 if (dy > 30) {
@@ -193,6 +206,7 @@ class TetrisGame {
         this.currentPiece = null;
         this.fallingBlocks = [];
         this.dropInterval = 1000;
+        this.pieceCount = 0;
         this.updateUI();
         this.draw();
         document.getElementById('startBtn').textContent = 'Start';
@@ -200,11 +214,23 @@ class TetrisGame {
     }
 
     spawnPiece() {
-        const pieceIndex = Math.floor(Math.random() * this.pieces.length);
-        const piece = this.pieces[pieceIndex];
+        this.pieceCount++;
 
-        // 20% chance to spawn breakable line piece (only for I-piece shape)
-        const isBreakable = pieceIndex === 0 && Math.random() < 0.2;
+        // Every 4th piece is a special breakable piece (I-piece shape)
+        const isBreakable = this.pieceCount % 4 === 0;
+
+        let pieceIndex;
+        let piece;
+
+        if (isBreakable) {
+            // Force spawn I-piece (index 0) for special pieces
+            pieceIndex = 0;
+            piece = this.pieces[0];
+        } else {
+            // Random piece for normal pieces
+            pieceIndex = Math.floor(Math.random() * this.pieces.length);
+            piece = this.pieces[pieceIndex];
+        }
 
         this.currentPiece = {
             shape: piece,
@@ -214,6 +240,16 @@ class TetrisGame {
             isBreakable: isBreakable,
             isBroken: false
         };
+
+        // Auto-break special pieces immediately after spawn
+        if (isBreakable) {
+            // Small delay to ensure piece is visible before breaking
+            setTimeout(() => {
+                if (this.currentPiece && this.currentPiece.isBreakable) {
+                    this.breakPiece();
+                }
+            }, 100);
+        }
 
         if (this.collision(0, 0)) {
             this.gameOver = true;
