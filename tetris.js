@@ -38,9 +38,15 @@ class TetrisGame {
             [[0, 1, 1], [1, 1, 0]]
         ];
 
+        // Breakable line piece settings
+        this.breakableColor = 'linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #FFA07A)';
+        this.breakableSolidColor = '#FF6B6B'; // Fallback for canvas
+        this.fallingBlocks = []; // Array to track falling individual blocks
+
         this.touchStartX = null;
         this.touchStartY = null;
         this.touchStartTime = null;
+        this.lastTapTime = 0;
 
         this.init();
     }
@@ -74,6 +80,9 @@ class TetrisGame {
                 case ' ':
                     this.rotatePiece();
                     break;
+                case 'Shift':
+                    this.breakPiece();
+                    break;
             }
         });
 
@@ -98,12 +107,23 @@ class TetrisGame {
             const dy = touchEndY - this.touchStartY;
 
             if (touchDuration < 200 && Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-                // Tap detected - rotate based on screen side
-                const canvasRect = this.canvas.getBoundingClientRect();
-                const tapX = touchEndX - canvasRect.left;
-                const canvasCenter = canvasRect.width / 2;
-                const clockwise = tapX > canvasCenter;
-                this.rotatePiece(clockwise);
+                // Tap detected
+                const currentTime = Date.now();
+                const timeSinceLastTap = currentTime - this.lastTapTime;
+
+                // Double-tap detected (within 300ms) - break piece
+                if (timeSinceLastTap < 300) {
+                    this.breakPiece();
+                    this.lastTapTime = 0; // Reset to prevent triple-tap issues
+                } else {
+                    // Single tap - rotate based on screen side
+                    const canvasRect = this.canvas.getBoundingClientRect();
+                    const tapX = touchEndX - canvasRect.left;
+                    const canvasCenter = canvasRect.width / 2;
+                    const clockwise = tapX > canvasCenter;
+                    this.rotatePiece(clockwise);
+                    this.lastTapTime = currentTime;
+                }
             } else if (Math.abs(dx) > Math.abs(dy)) {
                 if (dx > 30) {
                     this.movePiece(1, 0);
@@ -171,6 +191,7 @@ class TetrisGame {
         this.score = 0;
         this.resetBoard();
         this.currentPiece = null;
+        this.fallingBlocks = [];
         this.dropInterval = 1000;
         this.updateUI();
         this.draw();
@@ -181,11 +202,17 @@ class TetrisGame {
     spawnPiece() {
         const pieceIndex = Math.floor(Math.random() * this.pieces.length);
         const piece = this.pieces[pieceIndex];
+
+        // 20% chance to spawn breakable line piece (only for I-piece shape)
+        const isBreakable = pieceIndex === 0 && Math.random() < 0.2;
+
         this.currentPiece = {
             shape: piece,
             x: Math.floor((this.cols - piece[0].length) / 2),
             y: 0,
-            color: this.colors[pieceIndex]
+            color: isBreakable ? this.breakableSolidColor : this.colors[pieceIndex],
+            isBreakable: isBreakable,
+            isBroken: false
         };
 
         if (this.collision(0, 0)) {
@@ -214,6 +241,7 @@ class TetrisGame {
 
     rotatePiece(clockwise = true) {
         if (!this.currentPiece) return;
+        if (this.currentPiece.isBroken) return; // Can't rotate broken pieces
 
         let rotated;
         if (clockwise) {
@@ -234,6 +262,29 @@ class TetrisGame {
         if (this.collision(0, 0)) {
             this.currentPiece.shape = prevShape;
         }
+    }
+
+    breakPiece() {
+        if (!this.currentPiece || !this.currentPiece.isBreakable || this.currentPiece.isBroken) return;
+
+        // Mark piece as broken
+        this.currentPiece.isBroken = true;
+
+        // Create individual falling blocks from the current piece
+        for (let y = 0; y < this.currentPiece.shape.length; y++) {
+            for (let x = 0; x < this.currentPiece.shape[y].length; x++) {
+                if (this.currentPiece.shape[y][x]) {
+                    this.fallingBlocks.push({
+                        x: this.currentPiece.x + x,
+                        y: this.currentPiece.y + y,
+                        color: this.currentPiece.color
+                    });
+                }
+            }
+        }
+
+        // Clear the current piece
+        this.currentPiece = null;
     }
 
     collision(dx, dy) {
@@ -317,11 +368,18 @@ class TetrisGame {
                         this.drawBlock(
                             this.currentPiece.x + x,
                             this.currentPiece.y + y,
-                            this.currentPiece.color
+                            this.currentPiece.color,
+                            this.currentPiece.isBreakable
                         );
                     }
                 }
             }
+        }
+
+        // Draw falling blocks from broken pieces
+        for (let i = 0; i < this.fallingBlocks.length; i++) {
+            const block = this.fallingBlocks[i];
+            this.drawBlock(block.x, block.y, block.color, true);
         }
 
         this.ctx.strokeStyle = '#333';
@@ -339,7 +397,7 @@ class TetrisGame {
         }
     }
 
-    drawBlock(x, y, color) {
+    drawBlock(x, y, color, isBreakable = false) {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(
             x * this.blockSize + 1,
@@ -347,6 +405,41 @@ class TetrisGame {
             this.blockSize - 2,
             this.blockSize - 2
         );
+
+        // Add special effect for breakable pieces
+        if (isBreakable) {
+            // Add a glowing border effect
+            this.ctx.strokeStyle = '#FFD700';
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeRect(
+                x * this.blockSize + 2,
+                y * this.blockSize + 2,
+                this.blockSize - 4,
+                this.blockSize - 4
+            );
+
+            // Add subtle animation effect with pulsing brightness
+            const time = Date.now() / 500;
+            const brightness = Math.sin(time) * 0.2 + 0.3;
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+            this.ctx.fillRect(
+                x * this.blockSize + 1,
+                y * this.blockSize + 1,
+                this.blockSize - 2,
+                this.blockSize - 2
+            );
+
+            // Redraw the main color with transparency
+            this.ctx.fillStyle = color;
+            this.ctx.globalAlpha = 0.8;
+            this.ctx.fillRect(
+                x * this.blockSize + 1,
+                y * this.blockSize + 1,
+                this.blockSize - 2,
+                this.blockSize - 2
+            );
+            this.ctx.globalAlpha = 1.0;
+        }
 
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
         this.ctx.fillRect(
@@ -373,12 +466,56 @@ class TetrisGame {
 
         this.dropCounter += deltaTime;
         if (this.dropCounter > this.dropInterval) {
-            this.movePiece(0, 1);
+            // Update falling blocks if any exist
+            if (this.fallingBlocks.length > 0) {
+                this.updateFallingBlocks();
+            } else if (this.currentPiece) {
+                // Normal piece movement
+                this.movePiece(0, 1);
+            }
             this.dropCounter = 0;
         }
 
         this.draw();
         requestAnimationFrame((t) => this.gameLoop(t));
+    }
+
+    updateFallingBlocks() {
+        let allSettled = true;
+
+        // Move each block down if possible
+        for (let i = 0; i < this.fallingBlocks.length; i++) {
+            const block = this.fallingBlocks[i];
+
+            // Check if block can move down
+            if (block.y + 1 >= this.rows || this.board[block.y + 1][block.x]) {
+                // Block has settled - add to board
+                if (block.y >= 0) {
+                    this.board[block.y][block.x] = block.color;
+                }
+            } else {
+                // Block can still fall
+                block.y++;
+                allSettled = false;
+            }
+        }
+
+        // If all blocks have settled, clear them and spawn new piece
+        if (allSettled) {
+            // Lock all blocks
+            for (let i = 0; i < this.fallingBlocks.length; i++) {
+                const block = this.fallingBlocks[i];
+                if (block.y >= 0) {
+                    this.board[block.y][block.x] = block.color;
+                }
+            }
+
+            this.fallingBlocks = [];
+            this.score += 10;
+            this.clearLines();
+            this.spawnPiece();
+            this.updateUI();
+        }
     }
 
     updateUI() {
