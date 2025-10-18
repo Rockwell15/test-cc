@@ -554,17 +554,21 @@ class TetrisGame {
         for (let i = this.fallingBlocks.length - 1; i >= 0; i--) {
             const block = this.fallingBlocks[i];
 
-            // Check if block can move down
-            if (block.y + 1 >= this.rows || this.board[block.y + 1][block.x]) {
-                // Block has settled - lock it to the board
-                if (block.y >= 0) {
-                    this.board[block.y][block.x] = block.color;
+            // Keep falling until the block hits something
+            while (true) {
+                // Check if block can move down
+                if (block.y + 1 >= this.rows || this.board[block.y + 1][block.x]) {
+                    // Block has settled - lock it to the board
+                    if (block.y >= 0) {
+                        this.board[block.y][block.x] = block.color;
+                    }
+                    // Remove this block from the falling array
+                    this.fallingBlocks.splice(i, 1);
+                    break;
+                } else {
+                    // Block can still fall
+                    block.y++;
                 }
-                // Remove this block from the falling array
-                this.fallingBlocks.splice(i, 1);
-            } else {
-                // Block can still fall
-                block.y++;
             }
         }
 
