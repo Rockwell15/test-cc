@@ -284,6 +284,12 @@ class TetrisGame {
         if (this.collision(0, 0)) {
             this.gameOver = true;
             this.onGameOver();
+            return;
+        }
+
+        // Automatically break special pieces
+        if (isBreakable) {
+            this.breakPiece();
         }
     }
 
